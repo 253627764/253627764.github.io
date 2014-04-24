@@ -1,0 +1,202 @@
+新文章是 rake new_post['article name']
+
+rake generate 生成静态文件 
+rake watch 检测文件变化，实时生成新内容
+rake preview 在本机4000端口生成访问内容
+rake deploy 发布文件
+
+可以在generate后把网站放到本地的apache服务上先看一下效果，没问题再deploy
+脚本是：
+rake generate
+cp -r public/* /Library/WebServer/Documents/
+
+
+
+一些常用的宏：
+
+1. 显示摘要：
+<!--more-->
+
+2.显示代码片段：
+```  objc  (`是1左边的那个键）
+代码放这里
+```
+
+3. 插入gist代码：
+{% gist 1519172 %}
+
+
+4. 插入图片：
+{% img /images/mm.png %}
+
+图片放到source 的images目录下。
+
+5. 引用文字：
+{% blockquote %}
+这是一段引用的文字。
+第二行。
+{% endblockquote %}
+
+6. 设置category， （说明文档：http://octopress.org/docs/blogging/）
+# One category
+categories: Sass
+
+# Multiple categories example 1
+categories: [CSS3, Sass, Media Queries]
+
+
+7. 链接：
+<http://blog.devtang.com>
+
+[我的网站](http://blog.devtang.com)
+
+8. 标题
+# 一级标题
+## 二级标题
+###### 六级标题
+
+一级标题也可替换成：
+一级标题
+==============
+
+9. *斜体*
+    **粗体**
+    ***粗斜体***
+
+10. 可以在文章头部增加：
+     published: false 
+  来防止发布
+  或者 
+     author: Your Name 来改变作者
+
+
+
+
+
+一些定制信息：
+1. 定制头文件：
+/source/_includes/custom/head.html
+
+2. 定制About me: （介绍的文档：http://octopress.org/docs/theme/template/）
+source/_includes/custom/asides/about.html
+然后修改 _config.yml
+
+3. 修改_config.yml
+     把twitter完全注释掉，否则会连接twitter取js代码。然后被墙，造成访问一直loading
+
+4. 修改：sass/custom/_layout.scss
+    增加：$indented-lists: true; 使列表不再往左缩进
+
+
+5. 增加copyright：
+     修改source/_includes/post/copyright.html 文件。里面写上版权信息。
+     修改source/_layouts/post.html 文件，在合适位置加上：
+     <p class="meta">
+          {% include post/copyright.html %}
+     </p>
+
+6. 增加分享到新浪微博功能：
+     在_config.yml中增加一项： weibo_share: true
+     修改 source/_includes/post/sharing.html ，增加：
+```
+     ｛% if site.weibo_share %｝
+         ｛% include post/weibo.html %｝
+     ｛% endif %｝
+     增加source/_includes/post/weibo.html
+
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+本人定制--安装好了ruby和gem等工具要求版本 ruby2.1.1或以上 gem到最新版本 
+
+首先下载代码
+1.git clone git://github.com/imathis/octopress.git octopress
+
+2.《定制1》首先修改Gemfile中的rake版本号，由于本人的MAC10.9.2 电脑，Ruby版本为 2.1.1  rake版本为10.3.1
+ 最终修改为 gem 'rake', '~> 10.3.0'
+
+3.
+cd octopress
+gem install bundler
+bundle install             根据Gemfile文件进行安装特定版本的文件
+
+
+4.在octopress目录中配置github账号---设置github的账号和仓库地址
+rake      setup_github_pages
+提示可以用2种方式进行输入         
+输入   git@github.com:253627764/253627764.github.io  这种方式需要SSH key，安全性高---尝试OK
+或者输入    https://github.com/253627764/253627764.github.io.git   用github账号和密码方式
+
+
+5.安装默认的Octopress主题
+rake install  
+rake generate
+rake preview 本地验证
+
+
+6.
+将博客发布到Github上，输入下面命令：
+rake deploy	测试用https提交成功
+
+
+
+7.别忘了把所有源文件发布到 source 分支下面：
+
+注意没有用git init 说明用的是 octopress下面的git
+cd octopress
+git add .
+git commit -m “your message”
+git push origin source               提交到远程的source分支
+
+
+8.绑定域名
+cd octopress
+echo 'my.seevstudio.com >> source/CNAME
+
+git add .
+git commit -m "add CNAME FILE"
+git push origin source      #注意是添加到了source分支下
+
+
+
+9.
+_config.yml文件修改 
+url 从http://253627764.github.io 到 http://my.seevstudio.com
+其他的修改
+title:  Felixmao的技术博客
+subtitle: 记录下自己学习的点滴，专注移动领域开发
+author: Felixmao
+description: 希望通过这个博客，能够将自己的学习成果总结出来，与大家分享交流。
+
+excerpt_link: "阅读 &rarr;"  # "Continue reading" link text at the bottom of excerpted articles
+
+边栏的控制，原来是
+default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
+修改为---其他的功能如twitter，Google+后续再添加
+default_asides: [asides/recent_posts.html, custom/asides/about.html, custom/asides/weibo.html]
+
+#屏蔽twitter按键，防止被墙导致loading 失败
+twitter_user:
+twitter_tweet_button: false
+
+最后添加一个变量
+# Sina Weibo
+weibo_sharing: true
+
+
+10.
+其他的见版本移植文档---rake install 之后，直接覆盖目录就可以了
+
+注意新浪微博和uyan友言评论功能本地测试失败，需要安装到github网站之后才有效
+文件夹覆盖的方式应该在windows系统下进行，测试MAC 系统下面会整个文件夹覆盖，其他的文件会丢失
+
+
+11.至于CNAME 域名端的 配置，参考github。
+
+
+
+
+
+
+
